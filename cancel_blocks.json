@@ -1,0 +1,26 @@
+{
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "参加ありがとうございます。\n当日までに参加が難しくなった方は取り消しボタンを押してください"
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "取り消し",
+						"emoji": true
+					},
+					"value": "click_me_123",
+					"action_id": "cancel"
+				}
+			]
+		}
+	]
+}
