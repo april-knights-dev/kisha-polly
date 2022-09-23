@@ -2,6 +2,7 @@ import os
 import logging
 from logging import Logger
 import traceback
+from datetime import datetime
 
 from flask import Flask, request
 from slack_bolt.adapter.flask import SlackRequestHandler
@@ -42,9 +43,13 @@ def tell_response_url(ack: Ack, body: dict, respond: Respond, logger: Logger):
     assert body.get("response_url") is not None
     ack()
 
+    # 西暦取得
+    AD = datetime.now().year
+
     # ex. 12/24 -> 12_24_帰社日
     date_number = body["text"].split("/")
-    channel_name = f"{date_number[0]}_{date_number[1]}_帰社日"
+
+    channel_name = f"{AD}_{date_number[0]}_{date_number[1]}_帰社日"
 
     try:
         # チャンネル作成
