@@ -26,7 +26,6 @@ handler = SlackRequestHandler(app)
 
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=slack_token)
-channel_id = ""
 usergroup_id = "S040T3YQVK4" # ユーザグループ変更することがあれば書き換えてください
 
 
@@ -58,21 +57,31 @@ def tell_response_url(ack: Ack, body: dict, respond: Respond, logger: Logger):
         message = blocks_message(body["text"])
         respond(blocks=message["blocks"], response_type="in_channel")
 
-        # TODO: グローバル変数以外の方法でchannel_idの共有をしたい
-        global channel_id
+        # gunicornがなんらかの理由で再読み込みされた場合グローバル変数では消えてしまうため、
+        # 一時的にファイルにチャンネルIDを保存することに。
         channel_id = channel_careated_response["channel"]["id"]
+        with open("channel_id.txt", mode='w') as f:
+            f.write(channel_id)
         logger.info(f"チャンネル作成完了：{channel_id}")
 
     except SlackApiError:
-        # TODO: 実行者にエラーがわかるようにした方がいい？（今はログ見ないとわからない）
         traceback.print_exc()
     
 @app.action("join")
 def action_button_click(body: dict, ack: Ack, respond: Respond, logger: Logger):
     ack()
     try:
+        with open("channel_id.txt") as f:
+            channel_id = f.read()
+
+        logger.info(f"利用するチャンネルID：{channel_id}")
         client.conversations_invite(channel=channel_id, users=[body['user']['id']])
         logger.info(f"{body['user']['username']}が参加")
+
+    except FileNotFoundError:
+        traceback.print_exc()
+        logger.error(f"channel_id.txtが見つかりませんでした")
+    
     except Exception:
         traceback.print_exc()
 
