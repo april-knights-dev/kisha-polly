@@ -11,7 +11,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from typing import Callable
 
-from blocks import blocks_message
+from blocks import BlocksChangeMessage
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,7 +26,6 @@ handler = SlackRequestHandler(app)
 
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=slack_token)
-channel_id = ""
 usergroup_id = "S040T3YQVK4" # ユーザグループ変更することがあれば書き換えてください
 
 
@@ -42,37 +41,41 @@ def tell_response_url(ack: Ack, body: dict, respond: Respond, logger: Logger):
     logger.info("スラッシュコマンド実行")
     assert body.get("response_url") is not None
     ack()
+    change_message = BlocksChangeMessage()
 
     # 西暦取得
     AD = datetime.now().year
 
     # ex. 12/24 -> 12_24_帰社日
     date_number = body["text"].split("/")
-
     channel_name = f"{AD}_{date_number[0]}_{date_number[1]}_帰社日"
 
     try:
         # チャンネル作成
         channel_careated_response = client.conversations_create(name=channel_name, is_private=True)
-
-        message = blocks_message(body["text"])
-        respond(blocks=message["blocks"], response_type="in_channel")
-
-        # TODO: グローバル変数以外の方法でchannel_idの共有をしたい
-        global channel_id
         channel_id = channel_careated_response["channel"]["id"]
         logger.info(f"チャンネル作成完了：{channel_id}")
 
+        # チャンネルIDと帰社日の日付を変更したblocksを生成
+        change_message.blocks_change_date(body["text"])
+        change_message.blocks_add_channelid(channel_id)
+        respond(blocks=change_message.blocks_format["blocks"], response_type="in_channel")
+        
     except SlackApiError:
-        # TODO: 実行者にエラーがわかるようにした方がいい？（今はログ見ないとわからない）
         traceback.print_exc()
     
 @app.action("join")
 def action_button_click(body: dict, ack: Ack, respond: Respond, logger: Logger):
     ack()
     try:
+        # slackから送られてくるペイロードにblocksの情報が入っているのでそこからchannelidを取得
+        channel_id = body["message"]["blocks"][4]["elements"]["text"]
+        logger.info(f"利用するチャンネルID：{channel_id}")
+
+        # ボタンを押したユーザをチャンネルに招待
         client.conversations_invite(channel=channel_id, users=[body['user']['id']])
         logger.info(f"{body['user']['username']}が参加")
+    
     except Exception:
         traceback.print_exc()
 
