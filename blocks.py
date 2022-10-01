@@ -1,12 +1,21 @@
 import json
+import logging
 
-def blocks_message(date: str) -> dict:
-    text = f"今月の帰社日は{date}になります。\n参加される方は「 *参加* 」のボタンを押してください"
+logging.basicConfig(level=logging.INFO)
 
-    # BOM有りファイルを読み込む時はutf-8-sigをつけると読み込める
-    with open("vote_blocks.json", "r", encoding="utf-8-sig") as jsonf:
-        blocks_format = json.load(jsonf)
+class BlocksChangeMessage:
 
-    blocks_format["blocks"][1]["text"]["text"] = text
+    def __init__(self) -> None:
+        try:
+            # BOM有りファイルを読み込む時はutf-8-sigをつけると読み込める
+            with open("vote_blocks.json", "r", encoding="utf-8-sig") as jsonf:
+                self.blocks_format = json.load(jsonf)
+        except FileNotFoundError:
+            logging.error(f"vote_blocks.jsonが見つかりませんでした")
 
-    return blocks_format
+    def blocks_change_date(self, date: str) -> dict:
+        text = f"今月の帰社日は{date}になります。\n参加される方は「 *参加* 」のボタンを押してください"
+        self.blocks_format["blocks"][1]["text"]["text"] = text
+
+    def blocks_add_channelid(self, channel_id: str) -> dict:
+        self.blocks_format["blocks"][4]["elements"]["text"] = channel_id
