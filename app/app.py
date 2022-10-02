@@ -71,7 +71,7 @@ def action_button_click(body: dict, ack: Ack, respond: Respond, logger: Logger):
     ack()
     try:
         # slackから送られてくるペイロードにblocksの情報が入っているのでそこからchannelidを取得
-        channel_id = body["message"]["blocks"][4]["elements"]["text"]
+        channel_id = body["message"]["blocks"][4]["elements"][0]["text"]
         logger.info(f"利用するチャンネルID：{channel_id}")
 
         # ボタンを押したユーザをチャンネルに招待
