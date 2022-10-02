@@ -26,7 +26,7 @@ handler = SlackRequestHandler(app)
 
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=slack_token)
-usergroup_id = "S040T3YQVK4" # ユーザグループ変更することがあれば書き換えてください
+usergroup_id = "S040T3YQVK4"  # ユーザグループ変更することがあれば書き換えてください
 
 
 # リスナーのログと同時に見るためにペイロードを標準出力に表示するだけのmiddleware
@@ -34,6 +34,7 @@ usergroup_id = "S040T3YQVK4" # ユーザグループ変更することがあれ�
 def log_request(logger: Logger, body: dict, next: Callable[[], BoltResponse]):
     logger.info(body)
     next()
+
 
 # スラッシュコマンドのリスナー
 @app.command("/kisyabi")
@@ -64,6 +65,7 @@ def tell_response_url(ack: Ack, body: dict, respond: Respond, logger: Logger):
     except SlackApiError:
         traceback.print_exc()
     
+
 @app.action("join")
 def action_button_click(body: dict, ack: Ack, respond: Respond, logger: Logger):
     ack()
@@ -96,6 +98,7 @@ def action_button_click(body: dict, ack: Ack, respond: Respond, logger: Logger):
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
     return handler.handle(request)
+
 
 if __name__ == "__main__":
     # 検証時にはdebug=Trueにすると便利

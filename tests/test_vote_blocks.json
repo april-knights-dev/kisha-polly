@@ -1,0 +1,67 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "帰社日のご連絡",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "次回の帰社日は12/25になります。\n参加される方は「 *参加* 」のボタンを押してください"
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "参加"
+					},
+					"style": "primary",
+					"value": "click_me_123",
+					"action_id": "join"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*※以下管理者のみ実行可能*"
+			}
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "AAAAA9",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "締切",
+						"emoji": true
+					},
+					"value": "click_me_123",
+					"action_id": "close"
+				}
+			]
+		}
+	]
+}
