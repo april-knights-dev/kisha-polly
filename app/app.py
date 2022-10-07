@@ -11,7 +11,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from typing import Callable
 
-from blocks import BlocksChangeMessage
+from app.blocks import BlocksChangeMessage
 
 logging.basicConfig(level=logging.INFO)
 
@@ -69,17 +69,25 @@ def tell_response_url(ack: Ack, body: dict, respond: Respond, logger: Logger):
 @app.action("join")
 def action_button_click(body: dict, ack: Ack, respond: Respond, logger: Logger):
     ack()
-    try:
-        # slackから送られてくるペイロードにblocksの情報が入っているのでそこからchannelidを取得
-        channel_id = body["message"]["blocks"][4]["elements"][0]["text"]
-        logger.info(f"利用するチャンネルID：{channel_id}")
 
+    # slackから送られてくるペイロードにblocksの情報が入っているのでそこからchannelidを取得
+    channel_id = body["message"]["blocks"][4]["elements"][0]["text"]
+    logger.info(f"利用するチャンネルID：{channel_id}")
+
+    try:
         # ボタンを押したユーザをチャンネルに招待
         client.conversations_invite(channel=channel_id, users=[body['user']['id']])
         logger.info(f"{body['user']['username']}が参加")
-    
+
+    except SlackApiError as e:
+        if e.response["error"] == "already_in_channel":
+            logger.info(f"このユーザは既にチャンネルに入っています:{body['user']['username']}, response:{e.response['error']}")
+        else:
+            logger.error(e.response["error"])
+
     except Exception:
         traceback.print_exc()
+        
 
 
 @app.action("close")
