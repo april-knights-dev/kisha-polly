@@ -11,7 +11,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from typing import Callable
 
-from app.blocks import BlocksChangeMessage
+from blocks import BlocksChangeMessage
 
 logging.basicConfig(level=logging.INFO)
 
