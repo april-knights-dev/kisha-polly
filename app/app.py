@@ -1,17 +1,16 @@
-import os
 import logging
-from logging import Logger
+import os
 import traceback
 from datetime import datetime
-
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
-from slack_bolt import App, Ack, BoltResponse, Respond
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
+from logging import Logger
 from typing import Callable
 
 from blocks import BlocksChangeMessage
+from flask import Flask, request
+from slack_bolt import Ack, App, BoltResponse, Respond
+from slack_bolt.adapter.flask import SlackRequestHandler
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 logging.basicConfig(level=logging.INFO)
 
@@ -49,7 +48,7 @@ def tell_response_url(ack: Ack, body: dict, respond: Respond, logger: Logger):
 
     # ex. 12/24 -> 12_24_帰社日
     date_number = body["text"].split("/")
-    channel_name = f"{AD}_{date_number[0]}_{date_number[1]}_帰社日"
+    channel_name = f"tmp_{AD}_{date_number[0]}_{date_number[1]}_帰社日"
 
     try:
         # チャンネル作成
